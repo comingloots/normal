@@ -1,84 +1,545 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>NEXUS · Access Protocol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    html, body {
+    /* ———— RESET ———— */
+    * {
       margin: 0;
       padding: 0;
-      background: #fff;
-      height: 100%;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #0a0a0f;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
       overflow: hidden;
+      position: relative;
+    }
+
+    /* ———— ANIMATED STARFIELD CANVAS ———— */
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ———— GLOW ORB ———— */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.3;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: #00f0ff;
+      top: -200px;
+      right: -150px;
+      animation: floatOrb 12s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: #a855f7;
+      bottom: -150px;
+      left: -150px;
+      animation: floatOrb 16s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(60px, 40px) scale(1.2); }
+    }
+
+    /* ———— MAIN GLASS CARD ———— */
+    .card {
+      position: relative;
+      z-index: 10;
+      max-width: 460px;
+      width: 100%;
+      background: rgba(10, 10, 20, 0.55);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      border-radius: 48px;
+      padding: 44px 32px 38px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 240, 255, 0.05) inset;
+      text-align: center;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .card:hover {
+      transform: scale(1.01);
+    }
+
+    /* ———— STATUS PILL ———— */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 240, 255, 0.08);
+      color: #7df9ff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding: 6px 18px 6px 14px;
+      border-radius: 100px;
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      margin-bottom: 22px;
+    }
+    .pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00f0ff;
+      animation: blinkDot 1.4s infinite;
+    }
+    @keyframes blinkDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* ———— TYPOGRAPHY ———— */
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    h1 .accent {
+      background: linear-gradient(135deg, #00f0ff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sub {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.95rem;
+      font-weight: 400;
+      margin-bottom: 32px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ———— TIMER WITH RING ———— */
+    .timer-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .timer-ring-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 6px;
+    }
+
+    .timer-ring-container svg {
+      transform: rotate(-90deg);
+      width: 140px;
+      height: 140px;
+    }
+
+    .timer-ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.04);
+      stroke-width: 6;
+    }
+
+    .timer-ring-progress {
+      fill: none;
+      stroke: url(#ringGradient);
+      stroke-width: 6;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.35s ease, stroke 0.3s ease;
+      filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.3));
+    }
+
+    .timer-digits {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.8rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      transition: color 0.3s ease;
+    }
+    .timer-digits.warning {
+      color: #fbbf24;
+    }
+    .timer-digits.urgent {
+      color: #f87171;
+      animation: pulseText 1s infinite;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .timer-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.25);
+      margin-top: 4px;
+    }
+
+    /* ———— BUTTON ———— */
+    .join-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 18px 24px;
+      background: linear-gradient(135deg, #00f0ff, #7c3aed);
+      color: #0a0a0f;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 32px rgba(0, 240, 255, 0.2);
+      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
+    }
+    .join-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 60px;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .join-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 14px 44px rgba(0, 240, 255, 0.35);
+    }
+    .join-btn:active {
+      transform: scale(0.97);
+    }
+    .join-btn.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+      filter: grayscale(0.6);
+      transform: none !important;
+    }
+    .join-btn .arrow {
+      transition: transform 0.2s ease;
+    }
+    .join-btn:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    /* ———— META ROW ———— */
+    .meta-row {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .meta-item .icon {
+      font-size: 1rem;
+    }
+
+    /* ———— FOOTER ———— */
+    .footnote {
+      margin-top: 22px;
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.12);
+      letter-spacing: 0.04em;
+    }
+
+    /* ———— RESPONSIVE ———— */
+    @media (max-width: 440px) {
+      .card { padding: 32px 18px 30px; }
+      h1 { font-size: 2rem; }
+      .timer-ring-container, .timer-ring-container svg { width: 120px; height: 120px; }
+      .timer-digits { font-size: 2.2rem; }
+      .join-btn { font-size: 1rem; padding: 16px 20px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ORBS -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- STARFIELD CANVAS -->
+  <canvas id="starfield"></canvas>
+
+  <!-- CARD -->
+  <div class="card" role="main">
+
+    <!-- PILL -->
+    <div class="pill">
+      <span class="dot"></span> Live · 127 spots left
+    </div>
+
+    <!-- HEADLINE -->
+    <h1>Enter the <span class="accent">NEXUS</span></h1>
+    <p class="sub">Secure gateway to the inner circle.</p>
+
+    <!-- TIMER WITH RING -->
+    <div class="timer-section">
+      <div class="timer-ring-container">
+        <svg viewBox="0 0 140 140">
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00f0ff" />
+              <stop offset="100%" stop-color="#a855f7" />
+            </linearGradient>
+          </defs>
+          <circle class="timer-ring-bg" cx="70" cy="70" r="60" />
+          <circle class="timer-ring-progress" id="ringProgress" cx="70" cy="70" r="60"
+                  stroke-dasharray="376.99"
+                  stroke-dashoffset="0" />
+        </svg>
+        <div class="timer-digits" id="timerDisplay">10:00</div>
+      </div>
+      <div class="timer-label">⏳ Access window</div>
+    </div>
+
+    <!-- JOIN BUTTON -->
+    <a href="https://t.me/+6lIGnBv31Qc4NDZl"
+       class="join-btn"
+       id="joinBtn"
+       target="_blank"
+       rel="noopener noreferrer">
+      <span>Unlock Access</span>
+      <span class="arrow">→</span>
+    </a>
+
+    <!-- META ROW -->
+    <div class="meta-row">
+      <span class="meta-item"><span class="icon">🛡️</span> Encrypted</span>
+      <span class="meta-item"><span class="icon">⚡</span> Instant</span>
+      <span class="meta-item"><span class="icon">👾</span> 12k+ agents</span>
+    </div>
+
+    <div class="footnote">⚡ redirects to telegram · one-time session</div>
+  </div>
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      try {
-        const MAX_WHATSAPP = 3;
-        const TELEGRAM_URL = "https://t.me/comingloots";
-        const encodedLinks = [
-          "aHR0cHM6Ly93YS5tZS85MTk0NDEzNDE2MTU=",
-          "aHR0cHM6Ly93YS5tZS85MTk5ODAxOTk0NzQ=",
-          "aHR0cHM6Ly93YS5tZS85MTk3MDc4MDkzNDA=",
-          "aHR0cHM6Ly93YS5tZS85MTYzODU0NjM1NTk=",
-          "aHR0cHM6Ly93YS5tZS85MTk1NDQ5OTM0NTE=",
-          "aHR0cHM6Ly93YS5tZS85MTg2MjM4ODgyOTI=",
-          "aHR0cHM6Ly93YS5tZS85MTkxNTkzNjk1NDE=",
-          "aHR0cHM6Ly93YS5tZS85MTg4MDkyMzA5NTQ=",
-          "aHR0cHM6Ly93YS5tZS85MTk3OTEwOTYzMTc=",
-          "aHR0cHM6Ly93YS5tZS85MTkyMzUzNTY4NDY=",
-          "aHR0cHM6Ly93YS5tZS85MTkwMDY3NDAwOTQ=",
-          "aHR0cHM6Ly93YS5tZS85MTkyOTYxNjg0MDQ=",
-          "aHR0cHM6Ly93YS5tZS85MTk5MTc5NjgzMzA=",
-          "aHR0cHM6Ly93YS5tZS85MTk5OTMzNzk2Mzc=",
-          "aHR0cHM6Ly93YS5tZS85MTk1OTY3OTk4MDE=",
-          "aHR0cHM6Ly93YS5tZS85MTkzMjg1NTAxNDY=",
-          "aHR0cHM6Ly93YS5tZS85MTk4NzQ1MjQ3NjQ=",
-          "aHR0cHM6Ly93YS5tZS85MTgwMDY4NTU5MzE=",
-          "aHR0cHM6Ly93YS5tZS85MTkwNDc0OTk1OTI=",
-          "aHR0cHM6Ly93YS5tZS85MTc5ODMzMjQ3MTQ=",
-          "aHR0cHM6Ly93YS5tZS85MTg5ODQ2OTYxNTE=",
-          "aHR0cHM6Ly93YS5tZS85MTk5ODY3Mjg3NDA=",
-          "aHR0cHM6Ly93YS5tZS85MTkwMjQ3OTg3NzA=",
-           "aHR0cHM6Ly90Lm1lLytMRUw0dm45c3A0NHhaV0Ux",
-          "aHR0cHM6Ly93YS5tZS85MTc1ODQwMTk3NDg=",
-          "aHR0cHM6Ly93YS5tZS85MTgzMDA4OTI2NTk=",
-          "aHR0cHM6Ly93YS5tZS85MTk5NzM3MjkwNzk=",
-          "aHR0cHM6Ly93YS5tZS85MTcwODU2NzE1NzA=",
-          "aHR0cHM6Ly93YS5tZS85MTk3OTE1OTY1ODg=",
-          "aHR0cHM6Ly93YS5tZS85MTk0NzUxNDI3NDY=",
-          "aHR0cHM6Ly93YS5tZS85MTg0NDE5MDkzMzg=",
-          "aHR0cHM6Ly93YS5tZS85MTk5MDc3MDU2MTA=",
-          "aHR0cHM6Ly93YS5tZS85MTgzMzUwNDg4Mjc=",
-          "aHR0cHM6Ly93YS5tZS85MTkwNDc0OTk1OTI=",
-          "aHR0cHM6Ly93YS5tZS85MTk5NTU1Nzk4ODE=",
-          "aHR0cHM6Ly90Lm1lLytMRUw0dm45c3A0NHhaV0Ux"
-        ];
+    (function() {
+      'use strict';
 
-        const shownCount = parseInt(localStorage.getItem("shownNumbers")) || 0;
-        const decoded = encodedLinks.map(l => atob(l).trim());
-        const telegram = decoded.find(link => link.includes("t.me"));
-        const whatsapps = decoded.filter(link => link.includes("wa.me"));
+      // ——— CONFIG ———
+      const TELEGRAM_URL = 'https://t.me/+6lIGnBv31Qc4NDZl'; // <-- change this
+      const INITIAL_SECONDS = 600; // 10 min
+      const STORAGE_KEY = 'nexus_timer_rem';
 
-        if (shownCount >= MAX_WHATSAPP && telegram) {
-          localStorage.removeItem("shownNumbers");
-          window.location.replace(telegram);
+      // ——— DOM ———
+      const timerDisplay = document.getElementById('timerDisplay');
+      const ringProgress = document.getElementById('ringProgress');
+      const joinBtn = document.getElementById('joinBtn');
+
+      // ——— STATE ———
+      let remaining = INITIAL_SECONDS;
+      let timerInterval = null;
+      let isExpired = false;
+      const CIRCUMFERENCE = 376.99; // 2 * pi * 60
+
+      // ——— HELPERS ———
+      function formatTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+
+      function updateUI() {
+        // digits
+        timerDisplay.textContent = formatTime(remaining);
+        timerDisplay.classList.remove('warning', 'urgent');
+        if (remaining <= 60) timerDisplay.classList.add('urgent');
+        else if (remaining <= 180) timerDisplay.classList.add('warning');
+
+        // ring
+        const progress = 1 - (remaining / INITIAL_SECONDS);
+        const offset = CIRCUMFERENCE * progress;
+        ringProgress.style.strokeDashoffset = offset;
+
+        // ring color shift via gradient (we just let it ride, but we can tweak stroke)
+        if (remaining <= 60) {
+          ringProgress.style.filter = 'drop-shadow(0 0 20px rgba(248, 113, 113, 0.5))';
+        } else if (remaining <= 180) {
+          ringProgress.style.filter = 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.4))';
+        } else {
+          ringProgress.style.filter = 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.3))';
+        }
+      }
+
+      function handleExpiry() {
+        if (isExpired) return;
+        isExpired = true;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        remaining = 0;
+        updateUI();
+        timerDisplay.textContent = '00:00';
+        timerDisplay.classList.add('urgent');
+
+        joinBtn.classList.add('disabled');
+        joinBtn.innerHTML = `<span>⌛ Session closed</span>`;
+        joinBtn.href = '#';
+
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+      }
+
+      function tick() {
+        if (remaining <= 0) {
+          handleExpiry();
+          return;
+        }
+        remaining -= 1;
+        updateUI();
+
+        if (remaining % 5 === 0) {
+          try { localStorage.setItem(STORAGE_KEY, String(remaining)); } catch (_) {}
+        }
+      }
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(tick, 1000);
+      }
+
+      function loadState() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored !== null) {
+            const parsed = parseInt(stored, 10);
+            if (!isNaN(parsed) && parsed > 0 && parsed <= INITIAL_SECONDS) {
+              remaining = parsed;
+              return true;
+            }
+          }
+        } catch (_) {}
+        return false;
+      }
+
+      // ——— STARFIELD ———
+      function initStars() {
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        const stars = [];
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        for (let i = 0; i < 140; i++) {
+          stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.2 + 0.4,
+            speed: Math.random() * 0.015 + 0.005,
+            opacity: Math.random() * 0.6 + 0.2,
+          });
+        }
+
+        let angle = 0;
+        function draw() {
+          ctx.clearRect(0, 0, w, h);
+          angle += 0.0004;
+
+          for (const s of stars) {
+            const dx = s.x - w/2;
+            const dy = s.y - h/2;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const rad = Math.atan2(dy, dx) + s.speed * 0.6 + angle * 0.02;
+            const drift = 0.6;
+            const px = w/2 + Math.cos(rad) * (dist + Math.sin(angle * 0.5 + s.x) * drift);
+            const py = h/2 + Math.sin(rad) * (dist + Math.cos(angle * 0.3 + s.y) * drift);
+
+            ctx.beginPath();
+            ctx.arc(px, py, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(180, 220, 255, ${s.opacity * (0.8 + 0.2 * Math.sin(angle * 2 + s.x))})`;
+            ctx.fill();
+          }
+          requestAnimationFrame(draw);
+        }
+        draw();
+      }
+
+      // ———— INIT ————
+      function init() {
+        const hasStored = loadState();
+        if (!hasStored) {
+          remaining = INITIAL_SECONDS;
+          try { localStorage.setItem(STORAGE_KEY, String(remaining)); } catch (_) {}
+        }
+
+        if (remaining <= 0) {
+          remaining = 0;
+          updateUI();
+          handleExpiry();
           return;
         }
 
-        const randomWA = whatsapps[Math.floor(Math.random() * whatsapps.length)];
-        localStorage.setItem("shownNumbers", shownCount + 1);
-        window.location.replace(randomWA);
+        updateUI();
+        startTimer();
 
-      } catch (err) {
-        console.error("Redirect error:", err);
+        // Backup expiry check
+        setInterval(() => {
+          if (remaining <= 0 && !isExpired) handleExpiry();
+        }, 2000);
+
+        initStars();
       }
-    });
+
+      init();
+    })();
   </script>
 </body>
 </html>
