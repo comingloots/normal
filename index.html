@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>NEXUS · Access Protocol</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RΞD · Access</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
   <style>
     /* ———— RESET ———— */
     * {
@@ -16,8 +16,8 @@
     }
 
     body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: #0a0a0f;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0002;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -25,345 +25,373 @@
       padding: 20px;
       overflow: hidden;
       position: relative;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
     }
 
-    /* ———— ANIMATED STARFIELD CANVAS ———— */
-    #starfield {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* ———— GLOW ORB ———— */
-    .orb {
+    /* ———— AMBIENT NEON RED ORBS ———— */
+    .glow-sphere {
       position: fixed;
       border-radius: 50%;
       filter: blur(120px);
-      opacity: 0.3;
-      z-index: 0;
       pointer-events: none;
+      z-index: 0;
     }
-    .orb-1 {
-      width: 500px;
-      height: 500px;
-      background: #00f0ff;
-      top: -200px;
-      right: -150px;
-      animation: floatOrb 12s ease-in-out infinite alternate;
+    .gs-1 {
+      width: 550px;
+      height: 550px;
+      background: #ff003c;
+      top: -280px;
+      right: -180px;
+      opacity: 0.12;
+      animation: orbFloat 18s ease-in-out infinite alternate;
     }
-    .orb-2 {
-      width: 400px;
-      height: 400px;
-      background: #a855f7;
-      bottom: -150px;
-      left: -150px;
-      animation: floatOrb 16s ease-in-out infinite alternate-reverse;
+    .gs-2 {
+      width: 450px;
+      height: 450px;
+      background: #cc0033;
+      bottom: -200px;
+      left: -120px;
+      opacity: 0.10;
+      animation: orbFloat 22s ease-in-out infinite alternate-reverse;
     }
-
-    @keyframes floatOrb {
+    @keyframes orbFloat {
       0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(60px, 40px) scale(1.2); }
+      100% { transform: translate(70px, -50px) scale(1.4); }
     }
 
-    /* ———— MAIN GLASS CARD ———— */
+    /* ———— BREATHING RED BORDER ———— */
     .card {
       position: relative;
       z-index: 10;
-      max-width: 460px;
+      max-width: 420px;
       width: 100%;
-      background: rgba(10, 10, 20, 0.55);
-      backdrop-filter: blur(24px) saturate(1.8);
-      -webkit-backdrop-filter: blur(24px) saturate(1.8);
-      border-radius: 48px;
-      padding: 44px 32px 38px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 240, 255, 0.05) inset;
+      background: rgba(10, 0, 2, 0.65);
+      backdrop-filter: blur(36px) saturate(1.4);
+      -webkit-backdrop-filter: blur(36px) saturate(1.4);
+      border-radius: 56px;
+      padding: 44px 28px 36px;
+      border: 1px solid rgba(255, 0, 60, 0.15);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 0, 60, 0.05) inset;
       text-align: center;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 1.5s ease;
+      animation: borderPulse 3s infinite alternate;
+    }
+    @keyframes borderPulse {
+      0% { border-color: rgba(255, 0, 60, 0.12); }
+      100% { border-color: rgba(255, 0, 60, 0.35); }
     }
     .card:hover {
-      transform: scale(1.01);
+      transform: scale(1.008);
     }
 
-    /* ———— STATUS PILL ———— */
-    .pill {
+    /* ———— TOP BADGE (TERMINAL STYLE) ———— */
+    .badge-ios {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(0, 240, 255, 0.08);
-      color: #7df9ff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      padding: 6px 18px 6px 14px;
-      border-radius: 100px;
-      border: 1px solid rgba(0, 240, 255, 0.15);
-      margin-bottom: 22px;
+      gap: 10px;
+      background: rgba(255, 0, 60, 0.06);
+      backdrop-filter: blur(10px);
+      padding: 5px 18px 5px 12px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 0, 60, 0.10);
+      margin-bottom: 24px;
     }
-    .pill .dot {
-      width: 7px;
-      height: 7px;
+    .badge-ios .live-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: #00f0ff;
-      animation: blinkDot 1.4s infinite;
+      background: #ff003c;
+      box-shadow: 0 0 16px #ff003c;
+      animation: pulseDot 1.2s infinite;
     }
-    @keyframes blinkDot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.2; transform: scale(0.7); }
+    }
+    .badge-ios span {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .badge-ios .count {
+      color: #ff4d6d;
+      font-weight: 700;
+      background: rgba(255, 0, 60, 0.08);
+      padding: 0 12px;
+      border-radius: 20px;
     }
 
-    /* ———— TYPOGRAPHY ———— */
+    /* ———— HEADLINE ———— */
     h1 {
-      font-size: 2.4rem;
-      font-weight: 700;
-      line-height: 1.1;
-      color: #ffffff;
+      font-size: 2.6rem;
+      font-weight: 800;
       letter-spacing: -0.03em;
-      margin-bottom: 6px;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 4px;
     }
-    h1 .accent {
-      background: linear-gradient(135deg, #00f0ff, #a855f7);
+    h1 .gradient-text {
+      background: linear-gradient(135deg, #ff4d6d 0%, #cc0033 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      text-shadow: 0 0 40px rgba(255, 0, 60, 0.2);
     }
-
-    .sub {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.95rem;
+    .subhead {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.9rem;
       font-weight: 400;
       margin-bottom: 32px;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.04em;
     }
 
-    /* ———— TIMER WITH RING ———— */
-    .timer-section {
+    /* ———— TIMER + PROGRESS (NEON RED) ———— */
+    .timer-area {
+      margin-bottom: 34px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 34px;
-    }
-
-    .timer-ring-container {
-      position: relative;
-      width: 140px;
-      height: 140px;
-      margin-bottom: 6px;
-    }
-
-    .timer-ring-container svg {
-      transform: rotate(-90deg);
-      width: 140px;
-      height: 140px;
-    }
-
-    .timer-ring-bg {
-      fill: none;
-      stroke: rgba(255, 255, 255, 0.04);
-      stroke-width: 6;
-    }
-
-    .timer-ring-progress {
-      fill: none;
-      stroke: url(#ringGradient);
-      stroke-width: 6;
-      stroke-linecap: round;
-      transition: stroke-dashoffset 0.35s ease, stroke 0.3s ease;
-      filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.3));
     }
 
     .timer-digits {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2.8rem;
+      font-size: 3.8rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       color: #ffffff;
-      letter-spacing: 0.04em;
-      transition: color 0.3s ease;
+      letter-spacing: 0.02em;
+      transition: color 0.4s ease;
+      line-height: 1;
+      margin-bottom: 12px;
+      text-shadow: 0 0 30px rgba(255, 0, 60, 0.1);
     }
-    .timer-digits.warning {
-      color: #fbbf24;
-    }
-    .timer-digits.urgent {
-      color: #f87171;
-      animation: pulseText 1s infinite;
-    }
-
-    @keyframes pulseText {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+    .timer-digits.warning { color: #ff4d6d; }
+    .timer-digits.urgent { color: #ff003c; animation: textPulse 0.7s infinite; }
+    @keyframes textPulse {
+      0%, 100% { opacity: 1; text-shadow: 0 0 40px #ff003c; }
+      50% { opacity: 0.2; text-shadow: 0 0 0px #ff003c; }
     }
 
-    .timer-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: rgba(255, 255, 255, 0.25);
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      overflow: hidden;
       margin-top: 4px;
     }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff003c, #ff4d6d);
+      border-radius: 10px;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 0 30px rgba(255, 0, 60, 0.4);
+    }
 
-    /* ———— BUTTON ———— */
+    /* ———— LIVE JOIN TICKER (RED THEME) ———— */
+    .ticker-container {
+      width: 100%;
+      height: 28px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      background: rgba(255, 0, 60, 0.03);
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 1px solid rgba(255, 0, 60, 0.05);
+    }
+    .ticker-scroll {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: scrollTicker 12s linear infinite;
+    }
+    .ticker-item {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 0.75rem;
+      font-weight: 400;
+      white-space: nowrap;
+      padding: 0 12px;
+    }
+    .ticker-item strong {
+      color: #ff4d6d;
+      font-weight: 600;
+    }
+    .ticker-item .time-ago {
+      color: #ff003c;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    @keyframes scrollTicker {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-100%); }
+    }
+
+    /* ———— THE BUTTON (MAGNETIC RED) ———— */
     .join-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 14px;
       width: 100%;
       padding: 18px 24px;
-      background: linear-gradient(135deg, #00f0ff, #7c3aed);
-      color: #0a0a0f;
-      font-size: 1.15rem;
-      font-weight: 700;
+      background: #ff003c;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 600;
       border: none;
-      border-radius: 60px;
+      border-radius: 40px;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 8px 32px rgba(0, 240, 255, 0.2);
-      letter-spacing: 0.01em;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 40px rgba(255, 0, 60, 0.3);
       position: relative;
       overflow: hidden;
+      letter-spacing: 0.01em;
     }
-    .join-btn::before {
+    .join-btn::after {
       content: '';
       position: absolute;
-      inset: 0;
-      border-radius: 60px;
-      padding: 2px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
+      inset: -2px;
+      border-radius: 42px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .join-btn:hover::after {
+      opacity: 1;
     }
     .join-btn:hover {
-      transform: translateY(-2px) scale(1.01);
-      box-shadow: 0 14px 44px rgba(0, 240, 255, 0.35);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 56px rgba(255, 0, 60, 0.5);
+      background: #ff1a4a;
     }
     .join-btn:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
-    .join-btn.disabled {
-      opacity: 0.35;
-      pointer-events: none;
-      filter: grayscale(0.6);
-      transform: none !important;
+    .join-btn .icon-arrow {
+      transition: transform 0.3s ease;
+      font-size: 1.3rem;
     }
-    .join-btn .arrow {
-      transition: transform 0.2s ease;
-    }
-    .join-btn:hover .arrow {
-      transform: translateX(4px);
+    .join-btn:hover .icon-arrow {
+      transform: translateX(6px) rotate(-10deg);
     }
 
-    /* ———— META ROW ———— */
-    .meta-row {
+    /* pulsating glow ring behind button */
+    .btn-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 40px;
+      background: #ff003c;
+      filter: blur(40px);
+      opacity: 0.10;
+      z-index: -1;
+      animation: glowPulse 2s infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { transform: scale(1); opacity: 0.10; }
+      50% { transform: scale(1.06); opacity: 0.25; }
+    }
+
+    /* ———— FOOTER META (NO 12K MEMBERS) ———— */
+    .footer-meta {
       display: flex;
       justify-content: center;
       gap: 28px;
-      margin-top: 26px;
+      margin-top: 28px;
       padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      border-top: 1px solid rgba(255, 0, 60, 0.06);
     }
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 0.7rem;
+    .footer-meta span {
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 0.6rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .meta-item .icon {
-      font-size: 1rem;
+    .footer-meta .num {
+      color: rgba(255, 255, 255, 0.3);
+      font-weight: 700;
     }
-
-    /* ———— FOOTER ———— */
-    .footnote {
-      margin-top: 22px;
-      font-size: 0.6rem;
-      color: rgba(255, 255, 255, 0.12);
-      letter-spacing: 0.04em;
-    }
+    /* removed the member count line entirely */
 
     /* ———— RESPONSIVE ———— */
     @media (max-width: 440px) {
-      .card { padding: 32px 18px 30px; }
-      h1 { font-size: 2rem; }
-      .timer-ring-container, .timer-ring-container svg { width: 120px; height: 120px; }
-      .timer-digits { font-size: 2.2rem; }
+      .card { padding: 32px 18px 28px; border-radius: 40px; }
+      h1 { font-size: 2.2rem; }
+      .timer-digits { font-size: 3rem; }
       .join-btn { font-size: 1rem; padding: 16px 20px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ORBS -->
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
-  <!-- STARFIELD CANVAS -->
-  <canvas id="starfield"></canvas>
+  <!-- GLOW ORBS (RED) -->
+  <div class="glow-sphere gs-1"></div>
+  <div class="glow-sphere gs-2"></div>
 
   <!-- CARD -->
-  <div class="card" role="main">
+  <div class="card">
 
-    <!-- PILL -->
-    <div class="pill">
-      <span class="dot"></span> Live · 127 spots left
+    <!-- BADGE -->
+    <div class="badge-ios">
+      <span class="live-dot"></span>
+      <span>Live</span>
+      <span class="count" id="liveCount">89</span>
+      <span>joined</span>
     </div>
 
     <!-- HEADLINE -->
-    <h1>Enter the <span class="accent">NEXUS</span></h1>
-    <p class="sub">Secure gateway to the inner circle.</p>
+    <h1><span class="gradient-text">RΞD</span> Access</h1>
+    <p class="subhead">Invite‑only · 24h window</p>
 
-    <!-- TIMER WITH RING -->
-    <div class="timer-section">
-      <div class="timer-ring-container">
-        <svg viewBox="0 0 140 140">
-          <defs>
-            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00f0ff" />
-              <stop offset="100%" stop-color="#a855f7" />
-            </linearGradient>
-          </defs>
-          <circle class="timer-ring-bg" cx="70" cy="70" r="60" />
-          <circle class="timer-ring-progress" id="ringProgress" cx="70" cy="70" r="60"
-                  stroke-dasharray="376.99"
-                  stroke-dashoffset="0" />
-        </svg>
-        <div class="timer-digits" id="timerDisplay">10:00</div>
+    <!-- TIMER + PROGRESS -->
+    <div class="timer-area">
+      <div class="timer-digits" id="timerDisplay">10:00</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
       </div>
-      <div class="timer-label">⏳ Access window</div>
     </div>
 
-    <!-- JOIN BUTTON -->
-    <a href="https://t.me/+6lIGnBv31Qc4NDZl"
-       class="join-btn"
-       id="joinBtn"
-       target="_blank"
-       rel="noopener noreferrer">
-      <span>Unlock Access</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <!-- META ROW -->
-    <div class="meta-row">
-      <span class="meta-item"><span class="icon">🛡️</span> Encrypted</span>
-      <span class="meta-item"><span class="icon">⚡</span> Instant</span>
-      <span class="meta-item"><span class="icon">👾</span> 12k+ agents</span>
+    <!-- LIVE TICKER (FOMO) -->
+    <div class="ticker-container">
+      <div class="ticker-scroll" id="tickerScroll">
+        <!-- injected by JS -->
+      </div>
     </div>
 
-    <div class="footnote">⚡ redirects to telegram · one-time session</div>
+    <!-- BUTTON WITH GLOW (YOUR LINK) -->
+    <div style="position: relative; z-index: 1;">
+      <div class="btn-glow"></div>
+      <a href="https://t.me/+fB39naJwgfEzOWU1"
+         class="join-btn"
+         id="joinBtn"
+         target="_blank"
+         rel="noopener noreferrer">
+        <span>Enter Telegram</span>
+        <span class="icon-arrow">⟶</span>
+      </a>
+    </div>
+
+    <!-- FOOTER META (CLEAN, NO 12K) -->
+    <div class="footer-meta">
+      <span>🔒 <span class="num">256</span>‑bit</span>
+      <span>⚡ <span class="num">0%</span>‑latency</span>
+      <span>📱 Android & iOS ready</span>
+    </div>
   </div>
 
   <script>
@@ -371,22 +399,30 @@
       'use strict';
 
       // ——— CONFIG ———
-      const TELEGRAM_URL = 'https://t.me/+6lIGnBv31Qc4NDZl'; // <-- change this
+      const TELEGRAM_URL = 'https://t.me/+fB39naJwgfEzOWU1'; // YOUR EXACT LINK
       const INITIAL_SECONDS = 600; // 10 min
-      const STORAGE_KEY = 'nexus_timer_rem';
+      const STORAGE_KEY = 'red_timer';
 
       // ——— DOM ———
       const timerDisplay = document.getElementById('timerDisplay');
-      const ringProgress = document.getElementById('ringProgress');
+      const progressFill = document.getElementById('progressFill');
       const joinBtn = document.getElementById('joinBtn');
+      const liveCountEl = document.getElementById('liveCount');
 
       // ——— STATE ———
       let remaining = INITIAL_SECONDS;
       let timerInterval = null;
       let isExpired = false;
-      const CIRCUMFERENCE = 376.99; // 2 * pi * 60
 
-      // ——— HELPERS ———
+      // ——— FAKE USERNAMES (CYBER/RED THEME) ———
+      const fakeNames = [
+        '0x_red', 'crimson_byte', 'neon_ghost', 'shadow_ops', 'volt_agent',
+        'inferno_core', 'cyber_pulse', 'red_queen', 'delta_fire', 'omega_rx',
+        'phoenix_zk', 'rage_frame', 'synth_wave', 'void_runner', 'blaze_hash'
+      ];
+      const tickerScroll = document.getElementById('tickerScroll');
+
+      // ——— TIMER HELPERS ———
       function formatTime(sec) {
         const m = Math.floor(sec / 60);
         const s = sec % 60;
@@ -394,25 +430,16 @@
       }
 
       function updateUI() {
-        // digits
         timerDisplay.textContent = formatTime(remaining);
         timerDisplay.classList.remove('warning', 'urgent');
         if (remaining <= 60) timerDisplay.classList.add('urgent');
         else if (remaining <= 180) timerDisplay.classList.add('warning');
 
-        // ring
-        const progress = 1 - (remaining / INITIAL_SECONDS);
-        const offset = CIRCUMFERENCE * progress;
-        ringProgress.style.strokeDashoffset = offset;
+        const elapsed = INITIAL_SECONDS - remaining;
+        const pct = Math.min(100, (elapsed / INITIAL_SECONDS) * 100);
+        progressFill.style.width = pct + '%';
 
-        // ring color shift via gradient (we just let it ride, but we can tweak stroke)
-        if (remaining <= 60) {
-          ringProgress.style.filter = 'drop-shadow(0 0 20px rgba(248, 113, 113, 0.5))';
-        } else if (remaining <= 180) {
-          ringProgress.style.filter = 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.4))';
-        } else {
-          ringProgress.style.filter = 'drop-shadow(0 0 12px rgba(0, 240, 255, 0.3))';
-        }
+        if (remaining <= 0 && !isExpired) handleExpiry();
       }
 
       function handleExpiry() {
@@ -420,28 +447,22 @@
         isExpired = true;
         clearInterval(timerInterval);
         timerInterval = null;
-        remaining = 0;
-        updateUI();
         timerDisplay.textContent = '00:00';
         timerDisplay.classList.add('urgent');
-
         joinBtn.classList.add('disabled');
-        joinBtn.innerHTML = `<span>⌛ Session closed</span>`;
+        joinBtn.innerHTML = `<span>⌛ Session Expired</span><span class="icon-arrow">✕</span>`;
         joinBtn.href = '#';
-
-        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        joinBtn.style.opacity = '0.4';
+        joinBtn.style.pointerEvents = 'none';
+        try { localStorage.removeItem(STORAGE_KEY); } catch(_) {}
       }
 
       function tick() {
-        if (remaining <= 0) {
-          handleExpiry();
-          return;
-        }
+        if (remaining <= 0) { handleExpiry(); return; }
         remaining -= 1;
         updateUI();
-
         if (remaining % 5 === 0) {
-          try { localStorage.setItem(STORAGE_KEY, String(remaining)); } catch (_) {}
+          try { localStorage.setItem(STORAGE_KEY, String(remaining)); } catch(_) {}
         }
       }
 
@@ -460,56 +481,40 @@
               return true;
             }
           }
-        } catch (_) {}
+        } catch(_) {}
         return false;
       }
 
-      // ——— STARFIELD ———
-      function initStars() {
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        let w, h;
-        const stars = [];
-
-        function resize() {
-          w = canvas.width = window.innerWidth;
-          h = canvas.height = window.innerHeight;
+      // ——— TICKER ———
+      function buildTicker() {
+        const items = [];
+        for (let i = 0; i < 20; i++) {
+          const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+          const mins = Math.floor(Math.random() * 12) + 1;
+          const secs = Math.floor(Math.random() * 60);
+          items.push({ name, time: `${mins}m ${secs}s ago` });
         }
-        window.addEventListener('resize', resize);
-        resize();
+        return items;
+      }
 
-        for (let i = 0; i < 140; i++) {
-          stars.push({
-            x: Math.random() * w,
-            y: Math.random() * h,
-            r: Math.random() * 1.2 + 0.4,
-            speed: Math.random() * 0.015 + 0.005,
-            opacity: Math.random() * 0.6 + 0.2,
-          });
-        }
-
-        let angle = 0;
-        function draw() {
-          ctx.clearRect(0, 0, w, h);
-          angle += 0.0004;
-
-          for (const s of stars) {
-            const dx = s.x - w/2;
-            const dy = s.y - h/2;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            const rad = Math.atan2(dy, dx) + s.speed * 0.6 + angle * 0.02;
-            const drift = 0.6;
-            const px = w/2 + Math.cos(rad) * (dist + Math.sin(angle * 0.5 + s.x) * drift);
-            const py = h/2 + Math.sin(rad) * (dist + Math.cos(angle * 0.3 + s.y) * drift);
-
-            ctx.beginPath();
-            ctx.arc(px, py, s.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(180, 220, 255, ${s.opacity * (0.8 + 0.2 * Math.sin(angle * 2 + s.x))})`;
-            ctx.fill();
+      function renderTicker() {
+        const items = buildTicker();
+        let html = '';
+        for (let rep = 0; rep < 2; rep++) {
+          for (const item of items) {
+            html += `<div class="ticker-item">
+              <strong>${item.name}</strong> joined · <span class="time-ago">${item.time}</span>
+            </div>`;
           }
-          requestAnimationFrame(draw);
         }
-        draw();
+        tickerScroll.innerHTML = html;
+      }
+
+      // ———— LIVE COUNT (RANDOM SURGE) ————
+      let liveCount = 89;
+      function updateLiveCount() {
+        liveCount += Math.floor(Math.random() * 3) + 1;
+        liveCountEl.textContent = liveCount;
       }
 
       // ———— INIT ————
@@ -517,25 +522,31 @@
         const hasStored = loadState();
         if (!hasStored) {
           remaining = INITIAL_SECONDS;
-          try { localStorage.setItem(STORAGE_KEY, String(remaining)); } catch (_) {}
+          try { localStorage.setItem(STORAGE_KEY, String(remaining)); } catch(_) {}
         }
-
         if (remaining <= 0) {
           remaining = 0;
           updateUI();
           handleExpiry();
-          return;
+        } else {
+          updateUI();
+          startTimer();
         }
 
-        updateUI();
-        startTimer();
+        renderTicker();
+        setInterval(() => {
+          renderTicker();
+          tickerScroll.style.animation = 'none';
+          requestAnimationFrame(() => {
+            tickerScroll.style.animation = 'scrollTicker 12s linear infinite';
+          });
+        }, 14000);
 
-        // Backup expiry check
+        setInterval(updateLiveCount, 4000 + Math.random() * 4000);
+
         setInterval(() => {
           if (remaining <= 0 && !isExpired) handleExpiry();
         }, 2000);
-
-        initStars();
       }
 
       init();
